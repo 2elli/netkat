@@ -6,3 +6,8 @@
 (executable
   (name nka_check)
   (libraries unix netkat.netkat))
+
+(executable
+  (name netkat_ast)
+  (public_name netkat-ast)
+  (libraries netkat.netkat))
