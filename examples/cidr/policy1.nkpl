@@ -1,0 +1,38 @@
+internal = net(192.168.1.1/24)
+internal_net_src = @src0=192;@src1=168;@src2=1
+internal_net_dst = @dst0=192;@dst1=168;@dst2=1
+
+host_src = @src0=192;@src1=168;@src2=1;@src3=230
+host_dst = @src0=192;@src1=168;@src2=1;@src3=230
+
+malicious_src = @src0=192;@src1=168;@src2=1;@src3=231
+malicious_dst = @dst0=192;@dst1=168;@dst2=1;@dst3=231
+
+outside_src = @src0=1;@src1=1;@src2=1;@src3=1
+outside_dst = @dst0=1;@dst1=1;@dst2=1;@dst3=1
+
+remote_dst = @dst0=210;@dst1=51;@dst2=188;@dst3=116
+remote_src = @src0=210;@src1=51;@src2=188;@src3=116
+
+inbound = @dir=0
+outbound = @dir=1
+tcp = @proto=6
+ssh = @port=22
+http = @port=80
+https = @port=443
+
+trusted_inbound = host_src + remote_src
+banned = malicious_dst + malicious_src
+redirect_ssh = ((inbound & @port=22) . @port <- 50) + ((outbound & @port=50) . @port <- 22)
+anti_spoof = (inbound & (trusted_inbound + ~internal_net_src)) + (outbound & internal_net_src)
+
+firewall = anti_spoof . ~banned . tcp . (redirect_ssh + (https + http + @port=9000 + @port=31337))
+
+-- Check that a spoofed ip can't ge through
+check (inbound . tcp . ~(ssh + http + https + @port=9000 + @port=31337) . ~trusted_inbound) . firewall == drop
+check (inbound . host_src . ssh) . firewall !== drop
+check (inbound . outside_src . https) . firewall !== drop
+check (inbound . malicious_src . ssh) . firewall == drop
+check (outbound . internal_net_src . internal_net_dst) . firewall !== drop
+check (outbound . internal_net_dst . outside_src) . firewall == drop
+check (outbound . internal_net_src . remote_dst . @port=50) . firewall !== drop
