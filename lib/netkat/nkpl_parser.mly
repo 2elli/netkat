@@ -14,6 +14,8 @@ let add_macro s e = Hashtbl.replace macros s e
 
 %token LPAR RPAR EOF
 %token RANGESUM IMPORT CHECK PRINT TIKZ EQUIV NEQUIV LEQ FOR DO IN DOTDOT
+%token NET
+%token <Cidr.t> CIDR
 %token ARROW LAMBDA
 %token PLUS DIFF AND DOT STAR NEG XOR
 %token FWD BWD EXISTS FORALL REP SIMULATE LBRACE RBRACE LCURLY RCURLY COM
@@ -179,6 +181,7 @@ nk_at:
   | f = IDENT; NTST; v = IDENT { (*match get_constant v with Some(i) -> Nkexp.filter false (Field.get_or_assign_fid f) (Value.of_int i) | None ->*) Nkexp.vfilter false (Field.get_or_assign_fid f) v }
   | f = IDENT; MOD; v = IDENT { (*match get_constant v with Some(i) -> Nkexp.modif (Field.get_or_assign_fid f) (Value.of_int i) | None ->*) Nkexp.vmodif (Field.get_or_assign_fid f) v }
   | v=IDENT { Nkexp.Var(v)(*(get_macro v)*) }
+  | NET; LPAR; c=CIDR; RPAR { Cidr.to_exp c }
   | DUP { Nkexp.dup }
   | DROP { Nkexp.drop }
   | SKIP { Nkexp.skip }

@@ -57,7 +57,9 @@ let to_string t = match t with
 | LBRACE -> "LBRACE"
 | LCURLY -> "LCURLY"
 | RCURLY -> "RCURLY"
-|COM -> "COM"
+| COM -> "COM"
+| NET -> "NET"
+| CIDR c -> Printf.sprintf "CIDR(%s)" (Cidr.to_string c)
 
 let can_end_cmd t = match t with
 | Some(DROP | SKIP | DUP | RPAR | STAR | NUM _ | IDENT _ | FILENAME _) -> true
@@ -78,6 +80,7 @@ let fn = [%sedlex.regexp? Star ch]
 let whsp = [%sedlex.regexp? ' ' | '\t' | '\r' | '\n' | '?']
 let newline = [%sedlex.regexp? '\n']
 let comment = [%sedlex.regexp? "--", Star (Compl (Chars "\n")), '\n']
+let cidr = [%sedlex.regexp? Plus digit, '.', Plus digit, '.', Plus digit, '.', Plus digit, '/', Plus digit]
 
 let rec peek_token state buf =
   if Queue.is_empty state.lookahead then begin
@@ -116,6 +119,8 @@ and raw_token buf =
   | "check" ->  CHECK
   | "print" ->  PRINT
   | "tikz" ->  TIKZ
+  | "net" -> NET
+  | "cidr" ->  CIDR (Cidr.of_string (Sedlexing.Latin1.lexeme buf))
   | "drop"
   | "emp" ->  DROP
   | "eps"
@@ -132,6 +137,7 @@ and raw_token buf =
   | "do" ->  DO
   | ".." ->  DOTDOT
   | "in" ->  IN
+  | cidr ->  CIDR (Cidr.of_string (Sedlexing.Latin1.lexeme buf))
   | '(' ->  LPAR
   | ')' ->  RPAR
   | '[' ->  LBRACE
