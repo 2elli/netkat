@@ -80,7 +80,7 @@ let fn = [%sedlex.regexp? Star ch]
 let whsp = [%sedlex.regexp? ' ' | '\t' | '\r' | '\n' | '?']
 let newline = [%sedlex.regexp? '\n']
 let comment = [%sedlex.regexp? "--", Star (Compl (Chars "\n")), '\n']
-let cidr = [%sedlex.regexp? Plus digit, '.', Plus digit, '.', Plus digit, '.', Plus digit, '/', Plus digit]
+let cidr = [%sedlex.regexp? (Plus digit, '.', Plus digit, '.', Plus digit, '.', Plus digit, '/', Plus digit) | (Plus digit, '.', Plus digit, '.', Plus digit, '.', Plus digit) ]
 
 let rec peek_token state buf =
   if Queue.is_empty state.lookahead then begin

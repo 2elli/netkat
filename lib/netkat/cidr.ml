@@ -6,18 +6,21 @@ let to_list (ip : octets) : int list =
 
 let of_string (s : string) : t =
   let invalid () = failwith (Printf.sprintf "invalid network address: %s" s) in
-  match String.split_on_char '/' s with
-  | [ addr; p ] ->
-      let octets : octets =
-        match List.map int_of_string (String.split_on_char '.' addr) with
-        | [ a; b; c; d ] -> (a, b, c, d)
-        | _ -> invalid ()
-      in
-      let prefix = int_of_string p in
-      if List.exists (fun o -> o > 255) (to_list octets) || prefix > 32 then
-        invalid ()
-      else { octets; prefix }
-  | _ -> invalid ()
+  let create_octets (addr : string) : octets =
+    match List.map int_of_string (String.split_on_char '.' addr) with
+    | [ a; b; c; d ] -> (a, b, c, d)
+    | _ -> invalid ()
+  in
+  let addr, prefix =
+    match String.split_on_char '/' s with
+    | [ addr; p ] -> (addr, int_of_string p)
+    | [ addr ] -> (addr, 32)
+    | _ -> invalid ()
+  in
+  let octets = create_octets addr in
+  if List.exists (fun o -> o > 255) (to_list octets) || prefix > 32 then
+    invalid ()
+  else { octets; prefix }
 
 let to_string ({ octets; prefix } : t) : string =
   Printf.sprintf "%s/%d"
