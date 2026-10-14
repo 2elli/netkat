@@ -1,17 +1,17 @@
-internal_net_src = net(192.168.1.0/24)
-internal_net_dst = net(192.168.1.0/24)
+internal_net_src = netsrc(192.168.1.0/24)
+internal_net_dst = netdst(192.168.1.0/24)
 
-host_src = net(192.168.1.230)
-host_dst = net(192.168.1.230)
+host_src = netsrc(192.168.1.230)
+host_dst = netdst(192.168.1.230)
 
-malicious_src = net(192.168.1.231)
-malicious_dst = net(192.168.1.231)
+malicious_src = netsrc(192.168.1.231)
+malicious_dst = netdst(192.168.1.231)
 
-outside_src = net(1.1.1.1)
-outside_dst = net(1.1.1.1)
+outside_src = netsrc(1.1.1.1)
+outside_dst = netdst(1.1.1.1)
 
-remote_dst = net(210.51.188.116)
-remote_src = net(210.51.188.116)
+remote_dst = netdst(210.51.188.116)
+remote_src = netsrc(210.51.188.116)
 
 inbound = @dir=0
 outbound = @dir=1

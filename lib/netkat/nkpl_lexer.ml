@@ -58,7 +58,8 @@ let to_string t = match t with
 | LCURLY -> "LCURLY"
 | RCURLY -> "RCURLY"
 | COM -> "COM"
-| NET -> "NET"
+| NETSRC -> "NETSRC"
+| NETDST -> "NETDST"
 | CIDR c -> Printf.sprintf "CIDR(%s)" (Cidr.to_string c)
 
 let can_end_cmd t = match t with
@@ -119,7 +120,8 @@ and raw_token buf =
   | "check" ->  CHECK
   | "print" ->  PRINT
   | "tikz" ->  TIKZ
-  | "net" -> NET
+  | "netsrc" -> NETSRC
+  | "netdst" -> NETDST
   | "cidr" ->  CIDR (Cidr.of_string (Sedlexing.Latin1.lexeme buf))
   | "drop"
   | "emp" ->  DROP

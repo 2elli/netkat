@@ -1,4 +1,5 @@
 type octets = int * int * int * int
+type direction = SRC | DST
 type t = { octets : octets; prefix : int }
 
 let to_list (ip : octets) : int list =
@@ -27,10 +28,13 @@ let to_string ({ octets; prefix } : t) : string =
     (String.concat "." (List.map string_of_int (to_list octets)))
     prefix
 
-let to_exp ({ octets; prefix } : t) : Nkexp.t =
+let to_exp (dir : direction) ({ octets; prefix } : t) : Nkexp.t =
   let test k v =
     Nkexp.filter true
-      (Field.get_or_assign_fid (Printf.sprintf "@src%d" k))
+      (Field.get_or_assign_fid
+         (Printf.sprintf "@%s%d"
+            (match dir with SRC -> "src" | DST -> "dst")
+            k))
       (Value.of_int v)
   in
   let full = prefix / 8 and rest = prefix mod 8 in
